@@ -1,38 +1,48 @@
-var webpack = require('webpack');
-var path = require('path');
+const webpack = require('webpack');
+const path = require('path');
+const fs = require('fs');
 
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-var OpenBrowserPlugin = require('open-browser-webpack-plugin');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
+const OpenBrowserPlugin = require('open-browser-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-var ROOT_PATH = path.resolve(__dirname);
-var ENTRY_PATH = path.resolve(ROOT_PATH, 'src/js/index');
-var TEMPLATE_PATH = path.resolve(ROOT_PATH, 'src/index.html');
-var BUILD_PATH = path.resolve(ROOT_PATH, 'build');
+const ROOT_PATH = path.resolve(__dirname);
+const ENTRY_PATH = path.resolve(ROOT_PATH, 'src/js/index');
+const TEMPLATE_PATH = path.resolve(ROOT_PATH, 'src/index.html');
+const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
 
 const PORT = 8080;
 
-var config = {
-    entry: ENTRY_PATH,
-    devtool: 'source-map',
-    plugins: [
+const plugins = [
+    new HtmlWebpackPlugin({
+        inject: 'body',
+        template: TEMPLATE_PATH
+    }),
+    new ExtractTextPlugin('css/styles.css'),
+    new OpenBrowserPlugin({
+        url: `http://localhost:${PORT}/`
+    }),
+    new webpack.HotModuleReplacementPlugin()
+];
+
+if (fs.existsSync('./src/images')) {
+
+    plugins.push(
         new CopyWebpackPlugin([
             {
                 from: './src/images',
                 to: './images'
             }
         ]),
-        new HtmlWebpackPlugin({
-            inject: 'body',
-            template: TEMPLATE_PATH
-        }),
-        new ExtractTextPlugin('css/styles.css'),
-        new OpenBrowserPlugin({
-            url: `http://localhost:${PORT}/`
-        }),
-        new webpack.HotModuleReplacementPlugin()
-    ],
+    );
+
+}
+
+var config = {
+    entry: ENTRY_PATH,
+    devtool: 'source-map',
+    plugins: plugins,
     output: {
         path: BUILD_PATH,
         filename: 'bundle.js',
