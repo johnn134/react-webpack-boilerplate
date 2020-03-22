@@ -1,78 +1,106 @@
-var webpack = require('webpack');
-var path = require('path');
+const webpack = require('webpack');
+const path = require('path');
 
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-var OpenBrowserPlugin = require('open-browser-webpack-plugin');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-var ROOT_PATH = path.resolve(__dirname);
-var ENTRY_PATH = path.resolve(ROOT_PATH, 'src/js/index');
-var TEMPLATE_PATH = path.resolve(ROOT_PATH, 'src/index.html');
-var BUILD_PATH = path.resolve(ROOT_PATH, 'build');
+const PORT = 3000;
 
-const PORT = 8080;
+const ROOT_PATH = path.resolve(__dirname);
 
-var config = {
-    entry: ENTRY_PATH,
-    devtool: 'source-map',
-    plugins: [
-        new CopyWebpackPlugin([
-            {
-                from: './src/images',
-                to: './images'
-            }
-        ]),
+module.exports = env => ({
+    'entry': path.join(ROOT_PATH, 'src/js/index.js'),
+    'output': {
+        'path': path.join(ROOT_PATH, 'build'),
+        'filename': env.production ? 'static/js/bundle.min.js' : 'static/js/bundle.js'
+    },
+    'mode': env.production ? 'production' : 'development',
+    'devtool': env.production ? false : 'source-map',
+    'devServer': {
+        'compress': true,
+        'hot': true,
+        'inline': true,
+        'open': true,
+        'port': PORT,
+        'overlay': true,
+        'historyApiFallback': true
+    },
+    'optimization': {
+        'minimize': true
+    },
+    'performance': {
+        'hints': false
+    },
+    'resolve': {
+        'extensions': [
+            '.js',
+            '.jsx'
+        ],
+        //  Sets relative import path to src as root
+        'modules': [
+            path.join(ROOT_PATH, 'src'),
+            'node_modules'
+        ]
+    },
+    'plugins': [
         new HtmlWebpackPlugin({
-            inject: 'body',
-            template: TEMPLATE_PATH
+            'inject': true,
+            'template': path.join(ROOT_PATH, 'src/html/index.html'),
+            'filename': './index.html'
         }),
-        new ExtractTextPlugin('css/styles.css'),
-        new OpenBrowserPlugin({
-            url: `http://localhost:${PORT}/`
+        new MiniCssExtractPlugin({
+            'filename': 'static/css/[name].css',
+            'chunkFilename': 'static/css/[id].css'
         }),
         new webpack.HotModuleReplacementPlugin()
     ],
-    output: {
-        path: BUILD_PATH,
-        filename: 'bundle.js',
-        publicPath: '/'
-    },
-    devServer: {
-        historyApiFallback: true
-    },
-    resolve: {
-        extensions: ['.js', '.jsx']
-    },
-    module: {
-        loaders: [
+    'module': {
+        'rules': [
             {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: 'babel-loader',
-                query: {
-                    cacheDirectory: true,
-                    presets: ['babel-preset-env', 'babel-preset-react', 'babel-preset-stage-2']
-                }
+                'test': /\.(js|jsx)$/,
+                'exclude': /node_modules/,
+                'use': [
+                    {
+                        'loader': 'babel-loader',
+                        'options': {
+                            'presets': [
+                                '@babel/preset-env',
+                                '@babel/preset-react'
+                            ]
+                        }
+                    }
+                ]
             },
             {
-                test: /\.jsx?/,
-                exclude: /node_modules/,
-                loader: 'babel-loader'
+                'test': /\.html$/,
+                'use': ['html-loader']
             },
             {
-                test: /\.css?$/,
-                use: ExtractTextPlugin.extract({
-                    use: 'css-loader'
-                })
+                'test': /\.css$/,
+                'use': [
+                    {
+                        'loader': MiniCssExtractPlugin.loader,
+                        'options': {
+                            'publicPath': (resourcePath, context) =>
+                                `${path.relative(path.dirname(resourcePath), context)}/`
+                        }
+                    },
+                    'css-loader'
+                ]
             },
             {
-                test: /\.png$/,
-                exclude: /node_modules/,
-                loader: 'file-loader?name=images/[name].[ext]'
+                'test': /\.(jpe?g|png|svg|gif)$/i,
+                'use': [
+                    {
+                        'loader': 'file-loader',
+                        'options': {
+                            'name': '[name].[ext]',
+                            'publicPath': 'static/images',
+                            'outputPath': 'static/images'
+                        }
+                    }
+                ]
             }
         ]
     }
-};
-
-module.exports = config;
+});
