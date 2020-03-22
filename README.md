@@ -1,5 +1,5 @@
 # react-webpack-boilerplate
-Boilerplate for a React app supported by Webpack
+Boilerplate for a React app supported by Webpack & Babel
 
 ## React
 https://reactjs.org/

@@ -1,26 +1,33 @@
 {
-  "name": "webpack-environment",
+  "name": "react-webpack-boilerplate",
   "version": "1.0.0",
-  "description": "",
+  "description": "Boilerplate for react web applications with pre-built webpack and babel tooling.",
+  "author": "John Nelson",
+  "license": "ISC",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --open --mode development",
-    "build": "webpack --mode production"
+    "start": "webpack-dev-server --progress --color",
+    "build": "webpack --env.production",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3"
+  },
   "devDependencies": {
     "@babel/core": "^7.1.6",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/preset-env": "^7.1.6",
     "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.9.0",
+    "babel-eslint": "^10.1.0",
     "babel-loader": "^8.0.4",
     "css-loader": "^1.0.1",
+    "eslint": "^6.8.0",
     "file-loader": "^2.0.0",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3",
+    "mini-css-extract-plugin": "^0.9.0",
     "style-loader": "^0.23.1",
     "webpack": "^4.25.1",
     "webpack-cli": "^3.1.2",
